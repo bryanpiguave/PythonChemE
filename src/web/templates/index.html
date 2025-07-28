@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical Engineering Thermodynamics Toolkit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-atom"></i> ChemE Thermodynamics Toolkit</h1>
+                <p>Welcome! Explore interactive tools for chemical engineering calculations</p>
+                <div style="margin-top: 1rem; font-size: 0.9rem; color: #718096;">
+                    <i class="fas fa-lightbulb"></i> Tip: Click on any tool to start your calculations
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="nav-container">
+                <button class="nav-btn active" data-tool="rankine">
+                    <i class="fas fa-cog"></i>
+                    Rankine Cycle
+                </button>
+                <button class="nav-btn" data-tool="brayton">
+                    <i class="fas fa-fan"></i>
+                    Brayton Cycle
+                </button>
+                <button class="nav-btn" data-tool="refrigeration">
+                    <i class="fas fa-snowflake"></i>
+                    Refrigeration
+                </button>
+                <button class="nav-btn" data-tool="steam">
+                    <i class="fas fa-tint"></i>
+                    Steam Properties
+                </button>
+                <button class="nav-btn" data-tool="vle">
+                    <i class="fas fa-chart-line"></i>
+                    VLE Calculator
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Rankine Cycle Tool -->
+            <div id="rankine" class="tool-section active">
+                <div class="tool-header">
+                    <h2><i class="fas fa-cog"></i> Rankine Cycle Analysis</h2>
+                    <p>Analyze steam power cycles with customizable parameters</p>
+                </div>
+                
+                <div class="tool-container">
+                    <div class="input-panel">
+                        <h3>Input Parameters</h3>
+                        <div class="input-group">
+                            <label for="rankine-boiler-p">
+                                Boiler Pressure (MPa)
+                                <i class="fas fa-question-circle tooltip" style="margin-left: 0.5rem; color: #667eea; cursor: help;">
+                                    <span class="tooltiptext">The pressure at which steam is generated in the boiler. Higher pressures generally improve efficiency.</span>
+                                </i>
+                            </label>
+                            <input type="number" id="rankine-boiler-p" value="3.0" step="0.1" min="0.1" max="20" placeholder="Enter boiler pressure">
+                        </div>
+                        <div class="input-group">
+                            <label for="rankine-boiler-t">Boiler Temperature (K)</label>
+                            <input type="number" id="rankine-boiler-t" value="623.15" step="1" min="273" max="1000">
+                        </div>
+                        <div class="input-group">
+                            <label for="rankine-condenser-p">Condenser Pressure (MPa)</label>
+                            <input type="number" id="rankine-condenser-p" value="0.075" step="0.001" min="0.001" max="1">
+                        </div>
+                        <div class="input-group">
+                            <label for="rankine-pump-eff">Pump Efficiency</label>
+                            <input type="number" id="rankine-pump-eff" value="0.85" step="0.01" min="0.1" max="1">
+                        </div>
+                        <div class="input-group">
+                            <label for="rankine-turbine-eff">Turbine Efficiency</label>
+                            <input type="number" id="rankine-turbine-eff" value="0.85" step="0.01" min="0.1" max="1">
+                        </div>
+                        <button class="calculate-btn" onclick="calculateRankine()">
+                            <i class="fas fa-calculator"></i> Calculate
+                        </button>
+                    </div>
+                    
+                    <div class="results-panel">
+                        <h3>Results</h3>
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <span class="result-label">Thermal Efficiency</span>
+                                <span class="result-value" id="rankine-efficiency">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Net Work (kJ/kg)</span>
+                                <span class="result-value" id="rankine-net-work">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Heat Input (kJ/kg)</span>
+                                <span class="result-value" id="rankine-heat-input">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Pump Work (kJ/kg)</span>
+                                <span class="result-value" id="rankine-pump-work">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Turbine Work (kJ/kg)</span>
+                                <span class="result-value" id="rankine-turbine-work">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Back Work Ratio</span>
+                                <span class="result-value" id="rankine-back-work">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="rankine-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Brayton Cycle Tool -->
+            <div id="brayton" class="tool-section">
+                <div class="tool-header">
+                    <h2><i class="fas fa-fan"></i> Brayton Cycle Analysis</h2>
+                    <p>Analyze gas turbine cycles with customizable parameters</p>
+                </div>
+                
+                <div class="tool-container">
+                    <div class="input-panel">
+                        <h3>Input Parameters</h3>
+                        <div class="input-group">
+                            <label for="brayton-compressor-in-p">Compressor Inlet Pressure (kPa)</label>
+                            <input type="number" id="brayton-compressor-in-p" value="100" step="10" min="50" max="200">
+                        </div>
+                        <div class="input-group">
+                            <label for="brayton-compressor-in-t">Compressor Inlet Temperature (K)</label>
+                            <input type="number" id="brayton-compressor-in-t" value="300" step="5" min="250" max="350">
+                        </div>
+                        <div class="input-group">
+                            <label for="brayton-compressor-out-p">Compressor Outlet Pressure (kPa)</label>
+                            <input type="number" id="brayton-compressor-out-p" value="1000" step="50" min="200" max="2000">
+                        </div>
+                        <div class="input-group">
+                            <label for="brayton-turbine-in-t">Turbine Inlet Temperature (K)</label>
+                            <input type="number" id="brayton-turbine-in-t" value="1200" step="10" min="800" max="1500">
+                        </div>
+                        <div class="input-group">
+                            <label for="brayton-compressor-eff">Compressor Efficiency</label>
+                            <input type="number" id="brayton-compressor-eff" value="0.85" step="0.01" min="0.1" max="1">
+                        </div>
+                        <div class="input-group">
+                            <label for="brayton-turbine-eff">Turbine Efficiency</label>
+                            <input type="number" id="brayton-turbine-eff" value="0.85" step="0.01" min="0.1" max="1">
+                        </div>
+                        <button class="calculate-btn" onclick="calculateBrayton()">
+                            <i class="fas fa-calculator"></i> Calculate
+                        </button>
+                    </div>
+                    
+                    <div class="results-panel">
+                        <h3>Results</h3>
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <span class="result-label">Thermal Efficiency</span>
+                                <span class="result-value" id="brayton-efficiency">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Net Work (J/kg)</span>
+                                <span class="result-value" id="brayton-net-work">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Compressor Work (J/kg)</span>
+                                <span class="result-value" id="brayton-compressor-work">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Turbine Work (J/kg)</span>
+                                <span class="result-value" id="brayton-turbine-work">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Back Work Ratio</span>
+                                <span class="result-value" id="brayton-back-work">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="brayton-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Steam Properties Tool -->
+            <div id="steam" class="tool-section">
+                <div class="tool-header">
+                    <h2><i class="fas fa-tint"></i> Steam Properties Calculator</h2>
+                    <p>Calculate steam thermodynamic properties using IAPWS-IF97</p>
+                </div>
+                
+                <div class="tool-container">
+                    <div class="input-panel">
+                        <h3>Input Parameters</h3>
+                        <div class="input-group">
+                            <label for="steam-p">Pressure (MPa)</label>
+                            <input type="number" id="steam-p" value="1.0" step="0.1" min="0.001" max="22">
+                        </div>
+                        <div class="input-group">
+                            <label for="steam-t">Temperature (K)</label>
+                            <input type="number" id="steam-t" value="400" step="1" min="273" max="1000">
+                        </div>
+                        <div class="input-group">
+                            <label for="steam-x">Quality (0-1)</label>
+                            <input type="number" id="steam-x" value="0.5" step="0.01" min="0" max="1">
+                        </div>
+                        <div class="input-group">
+                            <label for="steam-property-type">Property Type</label>
+                            <select id="steam-property-type">
+                                <option value="PT">Pressure & Temperature</option>
+                                <option value="Px">Pressure & Quality</option>
+                                <option value="Ph">Pressure & Enthalpy</option>
+                                <option value="Ps">Pressure & Entropy</option>
+                            </select>
+                        </div>
+                        <button class="calculate-btn" onclick="calculateSteam()">
+                            <i class="fas fa-calculator"></i> Calculate
+                        </button>
+                    </div>
+                    
+                    <div class="results-panel">
+                        <h3>Steam Properties</h3>
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <span class="result-label">Pressure (MPa)</span>
+                                <span class="result-value" id="steam-result-p">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Temperature (K)</span>
+                                <span class="result-value" id="steam-result-t">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Specific Volume (m³/kg)</span>
+                                <span class="result-value" id="steam-result-v">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Enthalpy (kJ/kg)</span>
+                                <span class="result-value" id="steam-result-h">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Entropy (kJ/kg·K)</span>
+                                <span class="result-value" id="steam-result-s">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Internal Energy (kJ/kg)</span>
+                                <span class="result-value" id="steam-result-u">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Quality</span>
+                                <span class="result-value" id="steam-result-x">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Phase</span>
+                                <span class="result-value" id="steam-result-phase">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VLE Calculator Tool -->
+            <div id="vle" class="tool-section">
+                <div class="tool-header">
+                    <h2><i class="fas fa-chart-line"></i> Vapor-Liquid Equilibrium Calculator</h2>
+                    <p>Calculate phase equilibrium for binary mixtures</p>
+                </div>
+                
+                <div class="tool-container">
+                    <div class="input-panel">
+                        <h3>Input Parameters</h3>
+                        <div class="input-group">
+                            <label for="vle-t">Temperature (K)</label>
+                            <input type="number" id="vle-t" value="373.15" step="1" min="273" max="500">
+                        </div>
+                        <div class="input-group">
+                            <label for="vle-p-sat-1">Saturation Pressure 1 (Pa)</label>
+                            <input type="number" id="vle-p-sat-1" value="180000" step="1000" min="1000" max="1000000">
+                        </div>
+                        <div class="input-group">
+                            <label for="vle-p-sat-2">Saturation Pressure 2 (Pa)</label>
+                            <input type="number" id="vle-p-sat-2" value="74000" step="1000" min="1000" max="1000000">
+                        </div>
+                        <div class="input-group">
+                            <label for="vle-x1">Liquid Mole Fraction 1</label>
+                            <input type="number" id="vle-x1" value="0.5" step="0.01" min="0" max="1">
+                        </div>
+                        <div class="input-group">
+                            <label for="vle-model">Activity Coefficient Model</label>
+                            <select id="vle-model">
+                                <option value="ideal">Ideal Solution</option>
+                                <option value="wilson">Wilson</option>
+                                <option value="nrtl">NRTL</option>
+                            </select>
+                        </div>
+                        <div class="input-group wilson-params" style="display: none;">
+                            <label for="vle-a12">Wilson A12</label>
+                            <input type="number" id="vle-a12" value="0.0952" step="0.001">
+                        </div>
+                        <div class="input-group wilson-params" style="display: none;">
+                            <label for="vle-a21">Wilson A21</label>
+                            <input type="number" id="vle-a21" value="0.2713" step="0.001">
+                        </div>
+                        <button class="calculate-btn" onclick="calculateVLE()">
+                            <i class="fas fa-calculator"></i> Calculate
+                        </button>
+                    </div>
+                    
+                    <div class="results-panel">
+                        <h3>VLE Results</h3>
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <span class="result-label">Total Pressure (Pa)</span>
+                                <span class="result-value" id="vle-p-total">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Vapor Mole Fraction 1</span>
+                                <span class="result-value" id="vle-y1">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Vapor Mole Fraction 2</span>
+                                <span class="result-value" id="vle-y2">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Activity Coefficient 1</span>
+                                <span class="result-value" id="vle-gamma1">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Activity Coefficient 2</span>
+                                <span class="result-value" id="vle-gamma2">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="vle-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Refrigeration Cycle Tool -->
+            <div id="refrigeration" class="tool-section">
+                <div class="tool-header">
+                    <h2><i class="fas fa-snowflake"></i> Refrigeration Cycle Analysis</h2>
+                    <p>Analyze vapor compression refrigeration cycles</p>
+                </div>
+                
+                <div class="tool-container">
+                    <div class="input-panel">
+                        <h3>Input Parameters</h3>
+                        <div class="input-group">
+                            <label for="refrig-evap-t">Evaporator Temperature (K)</label>
+                            <input type="number" id="refrig-evap-t" value="253.15" step="1" min="200" max="300">
+                        </div>
+                        <div class="input-group">
+                            <label for="refrig-cond-t">Condenser Temperature (K)</label>
+                            <input type="number" id="refrig-cond-t" value="313.15" step="1" min="270" max="350">
+                        </div>
+                        <div class="input-group">
+                            <label for="refrig-refrigerant">Refrigerant</label>
+                            <select id="refrig-refrigerant">
+                                <option value="R134a">R134a</option>
+                                <option value="R22">R22</option>
+                                <option value="R410A">R410A</option>
+                                <option value="R404A">R404A</option>
+                            </select>
+                        </div>
+                        <button class="calculate-btn" onclick="calculateRefrigeration()">
+                            <i class="fas fa-calculator"></i> Calculate
+                        </button>
+                    </div>
+                    
+                    <div class="results-panel">
+                        <h3>Refrigeration Cycle Results</h3>
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <span class="result-label">Coefficient of Performance</span>
+                                <span class="result-value" id="refrig-cop">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Compressor Work (kJ/kg)</span>
+                                <span class="result-value" id="refrig-compressor-work">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Evaporator Heat (kJ/kg)</span>
+                                <span class="result-value" id="refrig-evaporator-heat">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Condenser Heat (kJ/kg)</span>
+                                <span class="result-value" id="refrig-condenser-heat">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="refrigeration-chart"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p class="footer-title">
+                        <i class="fas fa-atom"></i> 
+                        Chemical Engineering Thermodynamics Toolkit
+                    </p>
+                    <p class="footer-subtitle">
+                        Created with ❤️ by <a href="https://github.com/bryanpiguave" target="_blank" style="color: #667eea; text-decoration: none;">Bryan Piguave Llano</a>
+                    </p>
+                </div>
+                <div class="footer-right">
+                    <p class="footer-info">
+                        <i class="fas fa-graduation-cap"></i> Educational Tool
+                    </p>
+                    <p class="footer-info">
+                        <i class="fas fa-code"></i> Open Source
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='jss/script.js') }}"></script>
+</body>
+</html> 
